@@ -13,6 +13,9 @@ import (
 )
 
 func AppRoutesHandler() {
+
+	fmt.Println("Implementacionde servidor")
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -52,7 +55,6 @@ func AppRoutesHandler() {
 		s.SetContext(msg)
 		return "recv " + msg
 	})
-
 
 	server.OnEvent("/", "bye", func(s socketio.Conn) string {
 		last := s.Context().(string)
