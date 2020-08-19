@@ -7,6 +7,7 @@ import (
 	"github.com/googollee/go-engine.io/transport/polling"
 	"github.com/googollee/go-engine.io/transport/websocket"
 	socketio "github.com/googollee/go-socket.io"
+	"github.com/jdpadillaac/Angular-go-websokects/tree/master/go-websockets/websockets"
 	"github.com/rs/cors"
 	"log"
 	"net/http"
@@ -23,51 +24,21 @@ func AppRoutesHandler() {
 	})
 
 	pt := polling.Default
-
 	wt := websocket.Default
 	wt.CheckOrigin = func(req *http.Request) bool {
 		return true
 	}
 
-	server, err := socketio.NewServer(&engineio.Options{
-		Transports: []transport.Transport{
-			pt,
-			wt,
-		},
-	})
+	server, err := socketio.NewServer(&engineio.Options{Transports: []transport.Transport{pt, wt}})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	server.OnConnect("/", func(s socketio.Conn) error {
-		s.SetContext("")
-		fmt.Println("Nuevo usuario conectado con id:", s.ID())
-		return nil
-	})
+	websockets.SocketConnections(server)
+	websockets.SocketEvents(server)
+	websockets.ErrorConnections(server)
 
-	server.OnEvent("/", "notice", func(s socketio.Conn, msg string) {
-		fmt.Println("notice:", msg)
-		s.Emit("reply", "have "+msg)
-	})
-
-
-	server.OnEvent("/chat", "msg", func(s socketio.Conn, msg string) string {
-		s.SetContext(msg)
-		return "recv " + msg
-	})
-
-	server.OnEvent("/", "bye", func(s socketio.Conn) string {
-		last := s.Context().(string)
-		s.Emit("bye", last)
-		_ = s.Close()
-		return last
-	})
-	server.OnError("/", func(s socketio.Conn, e error) {
-		fmt.Println("meet error:", e)
-	})
-	server.OnDisconnect("/", func(s socketio.Conn, reason string) {
-		fmt.Println("Usuario desconctado", reason)
-	})
+	exampleRoutes(mux)
 
 	go server.Serve()
 	defer server.Close()
@@ -77,7 +48,7 @@ func AppRoutesHandler() {
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:4206"},
-		AllowedMethods:  []string{"GET", "PUT", "OPTIONS", "POST", "DELETE"},
+		AllowedMethods:   []string{"GET", "PUT", "OPTIONS", "POST", "DELETE"},
 		AllowCredentials: true,
 	})
 

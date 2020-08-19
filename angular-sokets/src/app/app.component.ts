@@ -11,9 +11,10 @@ export class AppComponent implements OnInit{
   title = 'angular-sokets';
 
   constructor(
-    public wsService: WebsocketService
+    public wsService: WebsocketService,
   ) {
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+  }
 }
