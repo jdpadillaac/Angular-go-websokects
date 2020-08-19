@@ -123,6 +123,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "angular-sokets"
+    }
+  },
+  "defaultProject": "angular-sokets",
+  "cli": {
+    "analytics": false
+  }
 }
